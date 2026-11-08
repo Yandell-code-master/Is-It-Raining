@@ -1,0 +1,82 @@
+let temporizador = null;
+let yaAvisado = false;
+const UMBRAL_PROBABILIDAD = 50; // % de probabilidad para avisar
+const UMBRAL_MM = 0.2;          // milímetros de lluvia para avisar
+const CADA_MINUTOS = 10;
+
+function obtenerUbicacion() {
+    return new Promise((resolve, reject) => {
+        const lat = parseFloat(document.getElementById('lat').value);
+        const lon = parseFloat(document.getElementById('lon').value);
+        if (!isNaN(lat) && !isNaN(lon)) return resolve({ lat, lon });
+        if (!navigator.geolocation) return reject(new Error('Sin geolocalización'));
+        navigator.geolocation.getCurrentPosition(
+            p => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+            () => reject(new Error('No pude obtener tu ubicación. Escribe las coordenadas a mano.'))
+        );
+    });
+}
+
+async function revisar() {
+    const estado = document.getElementById('estado');
+    const detalle = document.getElementById('detalle');
+    try {
+        const { lat, lon } = await obtenerUbicacion();
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+            + `&minutely_15=precipitation&hourly=precipitation_probability&current=precipitation`
+            + `&forecast_hours=2&forecast_minutely_15=8&timezone=auto`;
+        const r = await fetch(url);
+        const d = await r.json();
+
+        const ahora = d.current ? d.current.precipitation : 0;
+        const mmProximos = (d.minutely_15 ? d.minutely_15.precipitation : []).reduce((a, b) => a + (b || 0), 0);
+        const probs = d.hourly ? d.hourly.precipitation_probability : [];
+        const probMax = probs.length ? Math.max(...probs.slice(0, 2)) : 0;
+
+        const lloviendo = ahora > 0;
+        const vaALlover = mmProximos >= UMBRAL_MM || probMax >= UMBRAL_PROBABILIDAD;
+
+        if (lloviendo || vaALlover) {
+            estado.className = 'lluvia';
+            estado.textContent = lloviendo ? '🌧️ ¡Está lloviendo! Mete la ropa.' : '⚠️ Va a llover pronto. ¡Mete la ropa!';
+            if (!yaAvisado) { avisar(estado.textContent); yaAvisado = true; }
+        } else {
+            estado.className = 'seco';
+            estado.textContent = '☀️ Sin lluvia cercana. La ropa está tranquila.';
+            yaAvisado = false; // se reinicia para avisar en la próxima lluvia
+        }
+        detalle.textContent = `Ubicación: ${lat.toFixed(2)}, ${lon.toFixed(2)} · Prob. máx. próxima hora: ${probMax}% · Lluvia esperada: ${mmProximos.toFixed(1)} mm · Última revisión: ${new Date().toLocaleTimeString()}`;
+    } catch (e) {
+        estado.className = '';
+        estado.textContent = 'Error: ' + e.message;
+    }
+}
+
+function avisar(texto) {
+    if (Notification.permission === 'granted') new Notification('🧺 Alerta de lluvia', { body: texto });
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        o.connect(ctx.destination);
+        o.frequency.value = 880;
+        o.start();
+        setTimeout(() => o.stop(), 700);
+    } catch (e) { }
+}
+
+async function activar() {
+    if ('Notification' in window && Notification.permission !== 'granted') {
+        await Notification.requestPermission();
+    }
+    yaAvisado = false;
+    revisar();
+    clearInterval(temporizador);
+    temporizador = setInterval(revisar, CADA_MINUTOS * 60 * 1000);
+    document.getElementById('estado').textContent = 'Vigilancia activada. Revisando cada ' + CADA_MINUTOS + ' minutos.';
+}
+
+function detener() {
+    clearInterval(temporizador);
+    document.getElementById('estado').className = '';
+    document.getElementById('estado').textContent = 'Vigilancia detenida.';
+}
