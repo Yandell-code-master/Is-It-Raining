@@ -3,12 +3,18 @@ body {
     background: #eaf3fb;
     margin: 0;
     padding: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #1b2a3a;
 }
 
 .card {
+    width: 100%;
     max-width: 420px;
-    margin: 30px auto;
+    margin: 0;
     background: white;
     border-radius: 16px;
     padding: 24px;
@@ -34,6 +40,10 @@ h1 {
 
 #estado.seco {
     background: #d6f5dd;
+}
+
+#estado.vigilando {
+    background: #dbeafe;
 }
 
 button {

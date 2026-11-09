@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Nube con lluvia y una camiseta">
+    <defs>
+        <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3b8ef0" />
+            <stop offset="1" stop-color="#1f66cc" />
+        </linearGradient>
+    </defs>
+
+    <rect width="512" height="512" rx="112" fill="url(#fondo)" />
+
+    <path d="M 170 244 C 138 244 114 220 114 192 C 114 162 138 140 168 140 C 176 105 212 78 254 78 C 302 78 339 112 345 158 C 374 161 397 184 397 214 C 397 241 376 258 350 258 L 190 258 C 177 258 170 252 170 244 Z"
+        fill="#ffffff" />
+
+    <g fill="#bfe0ff">
+        <path d="M0 -22 C12 -6 20 4 20 15 C20 30 11 40 0 40 C-11 40 -20 30 -20 15 C-20 4 -12 -6 0 -22 Z"
+            transform="translate(200 292)" />
+        <path d="M0 -22 C12 -6 20 4 20 15 C20 30 11 40 0 40 C-11 40 -20 30 -20 15 C-20 4 -12 -6 0 -22 Z"
+            transform="translate(256 292)" />
+        <path d="M0 -22 C12 -6 20 4 20 15 C20 30 11 40 0 40 C-11 40 -20 30 -20 15 C-20 4 -12 -6 0 -22 Z"
+            transform="translate(312 292)" />
+    </g>
+
+    <path d="M 198 345 L 162 361 L 132 399 L 172 439 L 198 415 L 198 461 Q 198 473 210 473 L 302 473 Q 314 473 314 461 L 314 415 L 340 439 L 380 399 L 350 361 L 314 345 C 307 366 292 379 256 379 C 220 379 205 366 198 345 Z"
+        fill="#ffffff" />
+</svg>
